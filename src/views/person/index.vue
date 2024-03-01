@@ -39,7 +39,6 @@ const save = async () => {
   });
   store.avatarImg=form.avatar
   store.nickname=form.nickname
-  console.log("submit!");
 };
 const addCount = ()=>{
   store.increment();

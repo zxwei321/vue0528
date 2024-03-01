@@ -71,7 +71,6 @@ const submitForm = (formEl) => {
   });
 };
 const keyDown = (e) => {
-  console.log(e,'eeeeee');
   if (e.keyCode == 13 || e.keyCode == 100) {
     submitForm(formEl); // 定义的登录方法
   }

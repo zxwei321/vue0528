@@ -129,7 +129,7 @@ const tableColShow = ref(true)
             {{ scope.row.shown ? "是" : "否" }}
           </template>
         </el-table-column>
-        <el-table-column prop="component" label="菜单模板" />
+        <el-table-column prop="component" label="菜单模板" width="200" />
         <el-table-column prop="icons" label="菜单图标" align="center">
           <template #default="scope">
             <el-icon size="20"

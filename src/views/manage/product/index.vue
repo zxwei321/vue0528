@@ -25,7 +25,6 @@ const multiRows = ref();
 const handleDelAll = () => {
   let rows = multiRows.value;
   let rowsData = rows.getSelectionRows();
-  console.log(rowsData);
   ElMessageBox.confirm("你确定要批量删除数据吗？", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
@@ -85,12 +84,10 @@ const pageNo = ref(1);
 const pageSize = ref(4);
 const totalNum = ref(0);
 const handleCurrentChange = (val) => {
-  console.log(val);
   pageNo.value = val;
   load();
 };
 const handleSizeChange = (val) => {
-  console.log(val);
   pageSize.value = val;
   load();
 };
@@ -130,7 +127,6 @@ const dialogVisible = ref(false);
 const disabled = ref(false);
 const uploadRef = ref();
 const handleRemove = (file) => {
-  console.log(file);
 };
 
 const handlePictureCardPreview = (file) => {
@@ -139,7 +135,6 @@ const handlePictureCardPreview = (file) => {
 };
 
 const handleDownload = (file) => {
-  console.log(file);
 };
 const handleAvatarSuccess = (res) => {
   form.value.img = res;

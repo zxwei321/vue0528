@@ -44,7 +44,6 @@ const reset = () => {
 };
 //删除功能
 const handleDelAll = () => {
-  console.log(multiRows.value.getSelectionRows(), "delAll");
   ElMessageBox.confirm("确定要批量删除此内容", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
@@ -67,7 +66,6 @@ const handleDelAll = () => {
     });
 };
 const handleDel = (id) => {
-  console.log(id, "id");
   ElMessageBox.confirm("确定要删除此内容", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",

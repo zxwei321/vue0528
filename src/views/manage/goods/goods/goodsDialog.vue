@@ -67,19 +67,18 @@ const onSave = async () => {
 
 const uploadImg = ref();
 const postImg = (urlImg) => {
-  console.log(urlImg, "urlImg");
   form.image = urlImg;
 };
 
 const postValueHtml = (data) => {
   form.description = data;
+  console.log(form.description,'form.description')
 };
 
 //获取商品类别
 const categoryData = ref([]);
 const categoryList = async () => {
   const res = await list(1, 20);
-  console.log(res.data.data.data, "categoryList");
   categoryData.value = res.data.data.data;
 };
 

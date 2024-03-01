@@ -10,7 +10,6 @@ const emit = defineEmits(["on-submit"]);
 const roleId = ref();
 const ResourceDialogShow = (row) => {
   checkedIds.value = [];
-  console.log(row.id, "row");
   roleId.value = row.id;
   resourceList();
   resourceCheckedlist();
@@ -47,7 +46,6 @@ const resourceList = async () => {
 //已选择中的资源列表
 const resourceCheckedlist = async () => {
   const res = await getRoleResources(roleId.value);
-  console.log(res, "get");
   checkedIds.value = res.data.data;
 };
 

@@ -34,7 +34,6 @@ const dialogShow = (row) => {
 };
 //提交相关数据
 const onSave = async () => {
-  console.log(form, "form");
   if (createrResource.value) {
     await add(form);
     ElMessage({

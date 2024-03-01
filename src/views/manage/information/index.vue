@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, ref, watch, reactive } from "vue";
-import { Edit, Delete } from "@element-plus/icons-vue";
+import { Edit, Delete, Download, Plus, ZoomIn } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { add, del, update, dels, list, listPage } from "../../../api/menu";
+import { add, del, update, list, lists } from "../../../api/infor.js";
+
 //搜索
 const name = ref("");
 const search = () => {};
@@ -11,15 +12,19 @@ const reset = () => {};
 //添加
 const handleAdd = () => {
   dialogFormVisible.value = true;
-   Object.assign(form,initForm())
+  Object.assign(form,initForm())
 };
 
+//表格数据及操作
+const handleEdit = (row) => {
+  dialogFormVisible.value = true;
+  Object.assign(form,{...row})
+};
 //批量删除
 const multiRows = ref();
 const handleDelAll = () => {
   let rows = multiRows.value;
   let rowsData = rows.getSelectionRows();
-  console.log(rowsData);
   ElMessageBox.confirm("你确定要批量删除数据吗？", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
@@ -42,20 +47,19 @@ const handleDelAll = () => {
     });
 };
 
-//删除
-const handleDelete = (row) => {
+const handleDelete = (id) => {
   ElMessageBox.confirm("你确定要批量删除数据吗？", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
   })
     .then(async () => {
-      await del(row);
+      await del(id);
+      load();
       ElMessage({
         type: "success",
         message: "删除完成",
       });
-      load();
     })
     .catch(() => {
       ElMessage({
@@ -65,14 +69,11 @@ const handleDelete = (row) => {
     });
 };
 //列表
-const topMenu = ref([]);
 const load = async () => {
-  const res = await listPage(pageNo.value, pageSize.value);
-  const resALL = await list();
+  const res = await list(pageNo.value, pageSize.value);
   const { total, data } = res.data.data;
   totalNum.value = total;
   tableData.value = data;
-  topMenu.value = resALL.data.data.filter((item) => item.level === 0);
 };
 onMounted(() => {
   load();
@@ -80,7 +81,7 @@ onMounted(() => {
 const tableData = ref([]);
 //分页
 const pageNo = ref(1);
-const pageSize = ref(8);
+const pageSize = ref(4);
 const totalNum = ref(0);
 const handleCurrentChange = (val) => {
   pageNo.value = val;
@@ -96,44 +97,48 @@ const dialogFormVisible = ref(false);
 const formLabelWidth = "100px";
 const initForm = () => ({
   id: 0,
-  name: "",
   title: "",
-  path: "",
-  icons: "",
-  component: "",
-  shown: true,
-  pid: -1,
-  level: 0,
-  ordernumb: 0,
+  content: "",
+  author: ""
 });
 const form = reactive(initForm());
-// 添加
 const save = async () => {
   if (form.id > 0) {
-    if (form.pid > 0) {
-      form.level = 1;
-    }
-    await update(form);
+    const res = await update(form);
+    ElMessage({
+      message: "更新成功",
+      type: "success",
+    });
   } else {
-    if (form.pid > 0) {
-      form.level = 1;
-    }
-    await add(form);
+    const res = await add(form);
+    ElMessage({
+      message: "添加成功",
+      type: "success",
+    });
   }
-  ElMessage({
-    showClose: true,
-    message: "添加成功",
-    type: "success",
-  });
+
   load();
   dialogFormVisible.value = false;
 };
-//编辑
-const handleEdit = (row) => {
-  console.log(row);
-  dialogFormVisible.value = true;
-  Object.assign(form,{...row})
+//上传图片
+const dialogImageUrl = ref("");
+const dialogVisible = ref(false);
+const disabled = ref(false);
+const uploadRef = ref();
+const handleRemove = (file) => {
 };
+
+const handlePictureCardPreview = (file) => {
+  dialogImageUrl.value = file.url;
+  dialogVisible.value = true;
+};
+
+const handleDownload = (file) => {
+};
+const handleAvatarSuccess = (res) => {
+  form.value.author = res;
+};
+const handleChange = (res) => {};
 </script>
 
 <template>
@@ -184,53 +189,22 @@ const handleEdit = (row) => {
                 {{ scope.row.id }}
               </template>
             </el-table-column>
-            <el-table-column label="菜单名称">
-              <template #default="scope">
-                {{ scope.row.name }}
-              </template>
-            </el-table-column>
-            <el-table-column label="菜单标题">
+            <el-table-column label="标题">
               <template #default="scope">
                 {{ scope.row.title }}
               </template>
             </el-table-column>
-            <el-table-column label="菜单路径">
+            <el-table-column label="内容">
               <template #default="scope">
-                {{ scope.row.path }}
+                {{ scope.row.content }}
               </template>
             </el-table-column>
-            <el-table-column label="菜单图标">
+            <el-table-column label="图片">
               <template #default="scope">
-                {{ scope.row.icons }}
+                {{ scope.row.author }}
               </template>
             </el-table-column>
-            <el-table-column label="菜单模板">
-              <template #default="scope">
-                {{ scope.row.component }}
-              </template>
-            </el-table-column>
-            <el-table-column label="是否显示">
-              <template #default="scope">
-                {{ scope.row.shown === true ? "是" : "否" }}
-              </template>
-            </el-table-column>
-            <el-table-column label="父级">
-              <template #default="scope">
-                {{ scope.row.pid }}
-              </template>
-            </el-table-column>
-            <el-table-column label="层级">
-              <template #default="scope">
-                {{ scope.row.level }}
-              </template>
-            </el-table-column>
-            <el-table-column label="排序">
-              <template #default="scope">
-                {{ scope.row.ordernumb }}
-              </template>
-            </el-table-column>
-
-            <el-table-column label="操作" width="150" align="center">
+            <el-table-column label="操作" align="center">
               <template #default="scope">
                 <el-button size="small" @click="handleEdit(scope.row)"
                   >编辑</el-button
@@ -261,41 +235,68 @@ const handleEdit = (row) => {
     </el-row>
     <el-dialog v-model="dialogFormVisible" title="添加">
       <el-form :model="form">
-        <el-form-item label="菜单名称" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="菜单标题" :label-width="formLabelWidth">
-          <el-input v-model="form.title" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="菜单配置" :label-width="formLabelWidth">
-          <el-select v-model="form.pid" placeholder="请选择相关内容">
-            <el-option label="顶级菜单" :value="-1" />
-            <el-option
-              v-for="item in topMenu"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="菜单路径" :label-width="formLabelWidth">
-          <el-input v-model="form.path" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="菜单图标" :label-width="formLabelWidth">
-          <el-input v-model="form.icons" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="是否显示" :label-width="formLabelWidth">
-          <el-radio-group v-model="form.shown">
-            <el-radio :label="true">是</el-radio>
-            <el-radio :label="false">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="菜单模板" :label-width="formLabelWidth">
-          <el-input v-model="form.component" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="排序" :label-width="formLabelWidth">
-          <el-input v-model="form.ordernumb" autocomplete="off" />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="标题" :label-width="formLabelWidth">
+              <el-input v-model="form.title" autocomplete="off" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="内容" :label-width="formLabelWidth">
+              <el-input v-model="form.content" autocomplete="off" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="图片上传" :label-width="formLabelWidth">
+              <el-upload
+                ref="uploadRef"
+                action="http://localhost:8000/file/upload"
+                list-type="picture-card"
+                :limit="1"
+                :on-success="handleAvatarSuccess"
+                :on-change="handleChange"
+              >
+                <el-icon><Plus /></el-icon>
+
+                <template #file="{ file }">
+                  <div>
+                    <img
+                      class="el-upload-list__item-thumbnail"
+                      :src="file.url"
+                      alt=""
+                    />
+                    <span class="el-upload-list__item-actions">
+                      <span
+                        class="el-upload-list__item-preview"
+                        @click="handlePictureCardPreview(file)"
+                      >
+                        <el-icon><zoom-in /></el-icon>
+                      </span>
+                      <span
+                        class="el-upload-list__item-delete"
+                        @click="handleDownload(file)"
+                      >
+                        <el-icon><Download /></el-icon>
+                      </span>
+                      <span
+                        class="el-upload-list__item-delete"
+                        @click="handleRemove(file)"
+                      >
+                        <el-icon><Delete /></el-icon>
+                      </span>
+                    </span>
+                  </div>
+                </template>
+              </el-upload>
+
+              <el-dialog v-model="dialogVisible">
+                <img :src="dialogImageUrl" alt="Preview Image" />
+              </el-dialog>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -308,4 +309,28 @@ const handleEdit = (row) => {
 </template>
 
 <style scoped>
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+.el-icon {
+  border: 1px dashed #8c939d !important;
+  border-radius: 6px;
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
 </style>

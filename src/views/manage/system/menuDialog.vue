@@ -41,7 +41,6 @@ const dialogShow = (row) => {
 //提交相关数据
 const onSave = async () => {
   form.pid = selectMenuId.value;
-  console.log(form, "form");
   if (isCreate.value) {
     await add(form);
     emit("on-submit");
